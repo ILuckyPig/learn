@@ -1,4 +1,4 @@
-package lu.produce;
+package com.lu.produce;
 
 import com.lu.utils.YamlUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
