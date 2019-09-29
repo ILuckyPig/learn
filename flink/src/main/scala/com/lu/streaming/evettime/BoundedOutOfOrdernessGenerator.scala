@@ -4,9 +4,9 @@ import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks
 import org.apache.flink.streaming.api.watermark.Watermark
 
 /**
- * 基于系统时间的自定义周期性watermark
+ * 基于事件最大时间watermark
  */
-class TimeLagWatermarkGenerator extends AssignerWithPeriodicWatermarks[String] {
+class BoundedOutOfOrdernessGenerator extends AssignerWithPeriodicWatermarks[String] {
 
   val maxTimeLong = 3000;
 
