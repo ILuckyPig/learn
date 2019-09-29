@@ -1,4 +1,4 @@
-package lu.utils;
+package com.lu.utils;
 
 import org.yaml.snakeyaml.Yaml;
 
