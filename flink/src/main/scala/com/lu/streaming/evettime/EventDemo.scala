@@ -12,14 +12,13 @@ object EventDemo {
   def main(args: Array[String]): Unit = {
     val properties = PropertiesUtils.getKafkaProperties()
     val environment = StreamExecutionEnvironment.getExecutionEnvironment
-//    environment.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
-    val stream = environment.addSource(new FlinkKafkaConsumer[String]("test", new SimpleStringSchema(), properties))
-    stream
-        .map(w => (w, 1))
-        .timeWindowAll(Time.milliseconds(30))
-        .sum(1)
-        .map(kv => kv._2)
-        .print()
+    environment.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+    val stream = environment.addSource(new FlinkKafkaConsumer[String]("demo", new SimpleStringSchema(), properties))
+    val withTimestampsAndWatermarks = stream.assignTimestampsAndWatermarks(new TimeLagWatermarkGenerator)
+    withTimestampsAndWatermarks
+      .timeWindowAll(Time.seconds(5))
+      .reduce((v1, v2) => v1 + ","+ v2)
+      .print()
     environment.execute()
   }
 }
