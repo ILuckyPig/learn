@@ -4,7 +4,7 @@ import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks
 import org.apache.flink.streaming.api.watermark.Watermark
 
 /**
- * 基于事件最大时间watermark
+ * 基于事件最大时间戳watermark
  */
 class BoundedOutOfOrdernessGenerator extends AssignerWithPeriodicWatermarks[String] {
 
