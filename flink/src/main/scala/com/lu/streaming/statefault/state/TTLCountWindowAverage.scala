@@ -27,5 +27,6 @@ class TTLCountWindowAverage(ttlConfig: StateTtlConfig) extends RichFlatMapFuncti
   override def open(parameters: Configuration): Unit = {
     val valueStateDescriptor = new ValueStateDescriptor[(Long, Long)]("average", classOf[(Long, Long)])
     valueStateDescriptor.enableTimeToLive(ttlConfig)
+    sum = getRuntimeContext.getState(valueStateDescriptor)
   }
 }
