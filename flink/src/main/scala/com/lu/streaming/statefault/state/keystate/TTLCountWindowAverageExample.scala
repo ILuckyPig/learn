@@ -1,8 +1,7 @@
-package com.lu.streaming.statefault.state
+package com.lu.streaming.statefault.state.keystate
 
 import org.apache.flink.api.common.state.StateTtlConfig
 import org.apache.flink.api.common.time.Time
-import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 
 /**

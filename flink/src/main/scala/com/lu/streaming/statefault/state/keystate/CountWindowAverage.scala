@@ -1,4 +1,4 @@
-package com.lu.streaming.statefault.state
+package com.lu.streaming.statefault.state.keystate
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction
 import org.apache.flink.api.common.state.{ValueState, ValueStateDescriptor}
