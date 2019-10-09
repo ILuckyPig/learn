@@ -2,6 +2,7 @@ package com.lu.streaming.statefault.checkpointing
 
 import org.apache.flink.streaming.api.CheckpointingMode
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.apache.flink.streaming.api.scala._
 
 object CheckpointingExample {
   def main(args: Array[String]): Unit = {
@@ -31,5 +32,11 @@ object CheckpointingExample {
 
     // checkpoint会从最新的checkpoint恢复，即使有距离现在更近的savepoint
     environment.getCheckpointConfig.setPreferCheckpointForRecovery(true)
+
+    val source = environment.socketTextStream("localhost", 9999, '\n')
+    source
+      .map(line => (line.split(",")(0).toLong, line.split(",")(1).toLong))
+      .print()
+    environment.execute()
   }
 }

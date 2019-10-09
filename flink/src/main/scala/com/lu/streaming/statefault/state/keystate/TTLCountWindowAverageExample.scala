@@ -3,6 +3,7 @@ package com.lu.streaming.statefault.state.keystate
 import org.apache.flink.api.common.state.StateTtlConfig
 import org.apache.flink.api.common.time.Time
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.apache.flink.streaming.api.scala._
 
 /**
  * 状态有效期
