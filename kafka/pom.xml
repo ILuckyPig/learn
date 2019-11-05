@@ -53,7 +53,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.lu.produce.ProducerDemo</mainClass>
+                                    <mainClass>com.lu.kafka.produce.ProducerDemo</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
