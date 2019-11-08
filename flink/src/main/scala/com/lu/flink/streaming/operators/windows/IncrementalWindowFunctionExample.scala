@@ -16,7 +16,6 @@ object IncrementalWindowFunctionExample {
   def main(args: Array[String]): Unit = {
     val properties = PropertiesUtils.getKafkaProperties()
     val environment = StreamExecutionEnvironment.getExecutionEnvironment
-    environment.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
     val consumer = new FlinkKafkaConsumer[String]("demo", new SimpleStringSchema(), properties)
     consumer.setStartFromEarliest()
     val stream = environment.addSource(consumer).map(message => (message.split(" ")(1).split(",")(1), message.split(" ")(0)))
@@ -27,15 +26,21 @@ object IncrementalWindowFunctionExample {
       // TODO reduce with incremental
       .reduce(
         (r1: (String, String), r2: (String, String)) => { if (r1._2 > r2._2) r2 else r1 },
-        (key: Tuple,
-         context: ProcessWindowFunction[_, _, _, TimeWindow]#Context,
-         minMessage: Iterable[(String, String)],
-         out: Collector[(Long, String)]) => {
-          val min = minMessage.iterator.next()
-          out.collect((context.window.getStart, min._2))
-        }
+        new MyProcessWindowFunction
       )
+      .print()
 
     environment.execute()
+  }
+
+  // 返回窗口的开始时间和时间最小的元素
+  class MyProcessWindowFunction extends ProcessWindowFunction[(String, String), (Long, String), Tuple, TimeWindow] {
+    override def process(key: Tuple,
+                         context: Context,
+                         elements: Iterable[(String, String)],
+                         out: Collector[(Long, String)]): Unit = {
+      val min = elements.iterator.next()
+      out.collect((context.window.getStart, min._2))
+    }
   }
 }
