@@ -23,7 +23,7 @@ object IncrementalWindowFunctionExample {
     stream
       .keyBy(0)
       .timeWindow(Time.seconds(5))
-      // TODO reduce with incremental
+      // reduce with incremental
       .reduce(
         (r1: (String, String), r2: (String, String)) => { if (r1._2 > r2._2) r2 else r1 },
         new MyProcessWindowFunction
