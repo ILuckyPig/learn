@@ -8,7 +8,7 @@ import org.apache.flink.streaming.api.watermark.Watermark
  */
 class BoundedOutOfOrdernessGenerator extends AssignerWithPeriodicWatermarks[String] {
 
-  val maxTimeLong = 3000;
+  val maxTimeLong = 3000
 
   var currentMaxTimestamp: Long = _
 
