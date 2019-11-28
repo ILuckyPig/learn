@@ -5,7 +5,7 @@ import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.windowing.assigners.{ProcessingTimeSessionWindows, SlidingProcessingTimeWindows, TumblingProcessingTimeWindows}
 import org.apache.flink.streaming.api.windowing.time.Time
 
-object WindowJoin {
+object WindowJoinExample {
   def main(args: Array[String]): Unit = {
     val environment = StreamExecutionEnvironment.getExecutionEnvironment
     val firstSource = environment.socketTextStream("127.0.0.1", 9999).map(message => (message.toInt, 1))
