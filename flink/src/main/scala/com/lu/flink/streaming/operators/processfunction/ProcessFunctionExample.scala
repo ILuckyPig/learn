@@ -43,7 +43,6 @@ object ProcessFunctionExample {
       // initialize or retrieve/update the state
       val current: CountWithTimestamp = state.value match {
         case null =>
-          println("叫裂空", ctx)
           CountWithTimestamp(value._1, 1, ctx.timestamp)
         case CountWithTimestamp(key, count, lastModified) =>
           CountWithTimestamp(key, count + 1, ctx.timestamp)
