@@ -1,4 +1,4 @@
-package com.lu.flink.streaming.operators.asyncio
+package lu.flink.streaming.operators.asyncio
 
 import java.util.concurrent.TimeUnit
 
