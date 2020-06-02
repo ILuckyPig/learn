@@ -11,28 +11,33 @@ import java.nio.channels.AsynchronousFileChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
  * async file channel from jdk1.7
  */
 public class AsynchronousFileChannelDemo {
-    public static void main(String[] args) throws IOException, URISyntaxException {
+    public static void main(String[] args) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
         URL resource = FileChannelReadDemo.class.getResource("/log4j.properties");
         System.out.println(Paths.get(resource.toURI()).toString());
         Path path = Paths.get(Paths.get(resource.toURI()).toString());
         AsynchronousFileChannel asynchronousFileChannel = AsynchronousFileChannel.open(path, StandardOpenOption.READ);
-        ByteBuffer buffer = ByteBuffer.allocate(2048);
-
-        Future<Integer> read = asynchronousFileChannel.read(buffer, 0);
-        while (!read.isDone()) {
+        long length = path.toFile().length();
+        ByteBuffer buffer = ByteBuffer.allocate(100);
+        int i = 0;
+        int readInt;
+        while (i < length) {
+            Future<Integer> read = asynchronousFileChannel.read(buffer, i);
+            readInt = read.get();
             buffer.flip();
-            byte[] data = new byte[buffer.limit()];
-            buffer.get(data);
-            System.out.println(new String(data));
+            while (buffer.hasRemaining()) {
+                System.out.print((char) buffer.get());
+            }
             buffer.clear();
+            i += readInt;
         }
-
+        asynchronousFileChannel.close();
         // TODO http://ifeve.com/java-nio-asynchronousfilechannel/
 
     }
