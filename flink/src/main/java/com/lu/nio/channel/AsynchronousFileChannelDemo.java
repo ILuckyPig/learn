@@ -38,7 +38,5 @@ public class AsynchronousFileChannelDemo {
             i += readInt;
         }
         asynchronousFileChannel.close();
-        // TODO http://ifeve.com/java-nio-asynchronousfilechannel/
-
     }
 }
