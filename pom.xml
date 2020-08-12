@@ -10,8 +10,15 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>flink</module>
-        <module>kafka</module>
+        <module>producer</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.8.Final</version>
+        </dependency>
+    </dependencies>
 
 </project>

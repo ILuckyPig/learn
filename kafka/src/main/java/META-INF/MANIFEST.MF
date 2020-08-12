@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: com.lu.kafka.produce.ProducerDemo
-Class-Path: snakeyaml-1.17.jar snappy-java-1.1.7.1.jar kafka-clients-1.1
- .1.jar slf4j-api-1.7.25.jar lz4-java-1.4.1.jar
-
