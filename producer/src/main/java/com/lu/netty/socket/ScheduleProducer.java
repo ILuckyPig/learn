@@ -11,7 +11,7 @@ public class ScheduleProducer {
     public static String WARP = System.getProperty("line.separator");
 
     public String produceMessage() {
-        long epochSecond = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));
+        long epochSecond = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
         return KEY + "," + epochSecond + WARP;
     }
 
