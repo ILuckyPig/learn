@@ -1,4 +1,4 @@
-package com.lu.kafka.produce.eventtime;
+package com.lu.flink.kafka.produce.eventtime;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;

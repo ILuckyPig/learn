@@ -1,4 +1,4 @@
-package com.lu.kafka.flink.utils;
+package com.lu.flink.kafka.flink.utils;
 
 import org.yaml.snakeyaml.Yaml;
 

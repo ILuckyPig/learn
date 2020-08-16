@@ -1,6 +1,6 @@
-package com.lu.kafka.produce;
+package com.lu.flink.kafka.produce;
 
-import com.lu.kafka.flink.utils.YamlUtils;
+import com.lu.flink.kafka.flink.utils.YamlUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;

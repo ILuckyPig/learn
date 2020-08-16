@@ -1,4 +1,4 @@
-package com.lu.netty.socket;
+package com.lu.flink.netty.socket.event.time;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -9,10 +9,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-public class NettySchedulePushServer {
+public class EventTimeSchedulePushServer {
     private int port;
 
-    public NettySchedulePushServer(int port) {
+    public EventTimeSchedulePushServer(int port) {
         this.port = port;
     }
 
@@ -27,7 +27,7 @@ public class NettySchedulePushServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new NettyPushServerHandler());
+                            socketChannel.pipeline().addLast(new EventTimePushHandler());
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
@@ -48,6 +48,6 @@ public class NettySchedulePushServer {
         } else {
             port = 9999;
         }
-        new NettySchedulePushServer(port).run();
+        new EventTimeSchedulePushServer(port).run();
     }
 }

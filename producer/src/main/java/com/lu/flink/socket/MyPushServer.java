@@ -1,4 +1,4 @@
-package com.lu.socket;
+package com.lu.flink.socket;
 
 import java.io.*;
 import java.net.ServerSocket;
