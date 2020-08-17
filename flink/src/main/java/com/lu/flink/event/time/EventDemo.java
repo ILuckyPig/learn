@@ -1,4 +1,4 @@
-package com.lu.flink.even.time;
+package com.lu.flink.event.time;
 
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.typeinfo.Types;
