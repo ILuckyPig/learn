@@ -1,5 +1,6 @@
 package com.lu.flink.window.late.events;
 
+import com.lu.util.DateUtil;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple3;
@@ -24,7 +25,7 @@ public class LateEvents {
                 .map(message -> {
                     String[] strings = message.split(",");
                     LocalDateTime time = LocalDateTime.parse(strings[1]);
-                    long timestamp = time.toInstant(ZoneOffset.of("+8")).getEpochSecond();
+                    long timestamp = time.toInstant(ZoneOffset.of("+8")).toEpochMilli();
                     return Tuple3.of(strings[0], time, timestamp);
                 })
                 .returns(Types.TUPLE(Types.STRING, Types.LOCAL_DATE_TIME, Types.LONG));
@@ -37,20 +38,23 @@ public class LateEvents {
 
         source.assignTimestampsAndWatermarks(strategy)
                 .keyBy(tuple3 -> tuple3.f0)
-                .timeWindow(Time.seconds(14))
+                .timeWindow(Time.seconds(15))
                 .process(new ProcessWindowFunction<Tuple3<String, LocalDateTime, Long>, Tuple3<String, LocalDateTime, Long>, String, TimeWindow>() {
                     @Override
                     public void process(String key,
                                         Context context,
                                         Iterable<Tuple3<String, LocalDateTime, Long>> elements,
                                         Collector<Tuple3<String, LocalDateTime, Long>> out) throws Exception {
-                        System.out.println(key + ", " + context.window());
+                        System.out.printf("TimeWindow{start=%s, end=%s}, Watermark=%s%n",
+                                DateUtil.trans2LocalDateTime(context.window().getStart()),
+                                DateUtil.trans2LocalDateTime(context.window().getEnd()),
+                                context.currentWatermark()
+                        );
                         for (Tuple3<String, LocalDateTime, Long> element : elements) {
                             out.collect(element);
                         }
                     }
                 })
-                // TODO can not print any one element
                 .print();
 
         environment.execute();
