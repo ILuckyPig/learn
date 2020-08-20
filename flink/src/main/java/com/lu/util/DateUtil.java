@@ -1,8 +1,8 @@
 package com.lu.util;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 
 public class DateUtil {
     /**
@@ -12,6 +12,6 @@ public class DateUtil {
      * @return
      */
     public static LocalDateTime trans2LocalDateTime(long timestamp) {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.of("+8"));
+        return new Date(timestamp).toInstant().atZone(ZoneId.of("+8")).toLocalDateTime();
     }
 }
