@@ -1,15 +1,13 @@
 package com.lu.flink.window.late.events;
 
 import com.lu.util.DateUtil;
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.eventtime.*;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
-import org.apache.flink.streaming.api.watermark.Watermark;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -18,7 +16,6 @@ import org.apache.flink.util.Collector;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 
 public class LateEvents {
     public static void main(String[] args) throws Exception {
@@ -41,47 +38,56 @@ public class LateEvents {
                 // 指定event time
                 .withTimestampAssigner((tuple3, timestamp) -> tuple3.f2);
 
-        // TODO 自定义时间戳不能触发窗口
-        source
-                .assignTimestampsAndWatermarks(new AssignerWithPeriodicWatermarks<Tuple3<String, LocalDateTime, Long>>() {
-                    private long currentMaxTimestamp = Long.MIN_VALUE;
-
-                    private long outOfOrdernessMillis = 3000L;
-
+        WatermarkStrategy<Tuple3<String, LocalDateTime, Long>> watermarkStrategy = new WatermarkStrategy<Tuple3<String, LocalDateTime, Long>>() {
+            @Override
+            public WatermarkGenerator<Tuple3<String, LocalDateTime, Long>> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
+                return new WatermarkGenerator<Tuple3<String, LocalDateTime, Long>>() {
+                    private final long outOfOrdernessMillis = 3000L;
+                    private long currentMaxTimestamp = Long.MIN_VALUE + outOfOrdernessMillis;
                     private Watermark currentWaterMark;
 
                     @Override
-                    public Watermark getCurrentWatermark() {
-                        currentWaterMark = new Watermark(currentMaxTimestamp - outOfOrdernessMillis - 1);
-                        return currentWaterMark;
+                    public void onEvent(Tuple3<String, LocalDateTime, Long> event, long eventTimestamp, WatermarkOutput output) {
+                        currentMaxTimestamp = Math.max(currentMaxTimestamp, eventTimestamp);
+                        currentWaterMark = new Watermark(currentMaxTimestamp - outOfOrdernessMillis);
+                        System.out.printf("timestamp=%s, date=%s | currentMaxTimestamp=%s, currentMaxDate=%s | Watermark=%s, date=%s%n",
+                                event.f2,
+                                DateUtil.transFormat(event.f2),
+                                currentMaxTimestamp,
+                                DateUtil.transFormat(currentMaxTimestamp),
+                                currentWaterMark.getTimestamp(),
+                                DateUtil.transFormat(currentWaterMark.getTimestamp())
+                        );
+                        output.emitWatermark(currentWaterMark);
                     }
 
                     @Override
-                    public long extractTimestamp(Tuple3<String, LocalDateTime, Long> element, long recordTimestamp) {
-                        currentMaxTimestamp = Math.max(currentMaxTimestamp, element.f2);
-                        System.out.printf("timestamp=%s, date=%s | currentMaxTimestamp=%s, currentMaxDate=%s | %s%n",
-                                element.f2,
-                                DateUtil.trans2LocalDateTime(element.f2).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-                                currentMaxTimestamp,
-                                DateUtil.trans2LocalDateTime(currentMaxTimestamp).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-                                currentWaterMark.toString()
-                        );
-                        return currentMaxTimestamp;
+                    public void onPeriodicEmit(WatermarkOutput output) {
+                        // output.emitWatermark(new Watermark(currentMaxTimestamp - outOfOrdernessMillis));
                     }
-                })
+                };
+            }
+        }
+        .withTimestampAssigner((tuple3, timestamp) -> tuple3.f2);
+
+        source
+                .assignTimestampsAndWatermarks(watermarkStrategy)
                 .keyBy(tuple3 -> tuple3.f0)
-                .window(TumblingEventTimeWindows.of(Time.seconds(15)))
+                .window(TumblingEventTimeWindows.of(Time.seconds(10)))
+                // TODO custom trigger
                 .process(new ProcessWindowFunction<Tuple3<String, LocalDateTime, Long>, Tuple3<String, LocalDateTime, Long>, String, TimeWindow>() {
                     @Override
                     public void process(String key,
                                         Context context,
                                         Iterable<Tuple3<String, LocalDateTime, Long>> elements,
                                         Collector<Tuple3<String, LocalDateTime, Long>> out) throws Exception {
-                        System.out.printf("TimeWindow{start=%s, end=%s}, Watermark=%s, ProcessingTime=%s%n",
-                                DateUtil.trans2LocalDateTime(context.window().getStart()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-                                DateUtil.trans2LocalDateTime(context.window().getEnd()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                        System.out.printf("TimeWindow{start=%s, end=%s} | Watermark=%s, date=%s | ProcessingTime=%s, date=%s%n",
+                                DateUtil.transFormat(context.window().getStart()),
+                                DateUtil.transFormat(context.window().getEnd()),
                                 context.currentWatermark(),
-                                context.currentProcessingTime()
+                                DateUtil.transFormat(context.currentWatermark()),
+                                context.currentProcessingTime(),
+                                DateUtil.transFormat(context.currentProcessingTime())
                         );
                         for (Tuple3<String, LocalDateTime, Long> element : elements) {
                             out.collect(element);

@@ -7,6 +7,15 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 public abstract class PushHandler extends ChannelInboundHandlerAdapter {
     public static final String KEY = "key";
     public static String WARP = System.getProperty("line.separator");
+    private int gap = 5;
+
+    public int getGap() {
+        return gap;
+    }
+
+    public void setGap(int gap) {
+        this.gap = gap;
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -29,7 +38,7 @@ public abstract class PushHandler extends ChannelInboundHandlerAdapter {
             ctx.writeAndFlush(out);
 
             out.clear();
-            Thread.sleep(1000 * 5);
+            Thread.sleep(1000 * gap);
         }
     }
 }
