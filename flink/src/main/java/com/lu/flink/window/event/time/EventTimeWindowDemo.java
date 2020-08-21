@@ -1,4 +1,4 @@
-package com.lu.flink.window.late.events;
+package com.lu.flink.window.event.time;
 
 import com.lu.util.DateUtil;
 import org.apache.flink.api.common.eventtime.*;
@@ -17,10 +17,11 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-public class LateEvents {
+public class EventTimeWindowDemo {
     public static void main(String[] args) throws Exception {
         final StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
         environment.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+        environment.setParallelism(1);
 
         DataStream<Tuple3<String, LocalDateTime, Long>> source = environment.socketTextStream("localhost", 9999)
                 .map(message -> {
@@ -46,11 +47,13 @@ public class LateEvents {
                     private long currentMaxTimestamp = Long.MIN_VALUE + outOfOrdernessMillis;
                     private Watermark currentWaterMark;
 
+                    // 每条消息都生成watermark
                     @Override
                     public void onEvent(Tuple3<String, LocalDateTime, Long> event, long eventTimestamp, WatermarkOutput output) {
                         currentMaxTimestamp = Math.max(currentMaxTimestamp, eventTimestamp);
                         currentWaterMark = new Watermark(currentMaxTimestamp - outOfOrdernessMillis);
-                        System.out.printf("timestamp=%s, date=%s | currentMaxTimestamp=%s, currentMaxDate=%s | Watermark=%s, date=%s%n",
+                        System.out.printf("%s, watermark { timestamp=%s, date=%s | currentMaxTimestamp=%s, date=%s | Watermark=%s, date=%s }%n",
+                                Thread.currentThread().getName(),
                                 event.f2,
                                 DateUtil.transFormat(event.f2),
                                 currentMaxTimestamp,
@@ -61,6 +64,7 @@ public class LateEvents {
                         output.emitWatermark(currentWaterMark);
                     }
 
+                    // 周期性生成watermark
                     @Override
                     public void onPeriodicEmit(WatermarkOutput output) {
                         // output.emitWatermark(new Watermark(currentMaxTimestamp - outOfOrdernessMillis));
@@ -74,14 +78,15 @@ public class LateEvents {
                 .assignTimestampsAndWatermarks(watermarkStrategy)
                 .keyBy(tuple3 -> tuple3.f0)
                 .window(TumblingEventTimeWindows.of(Time.seconds(10)))
-                // TODO custom trigger
+                .trigger(CustomEventTimeTrigger.create())
                 .process(new ProcessWindowFunction<Tuple3<String, LocalDateTime, Long>, Tuple3<String, LocalDateTime, Long>, String, TimeWindow>() {
                     @Override
                     public void process(String key,
                                         Context context,
                                         Iterable<Tuple3<String, LocalDateTime, Long>> elements,
                                         Collector<Tuple3<String, LocalDateTime, Long>> out) throws Exception {
-                        System.out.printf("TimeWindow{start=%s, end=%s} | Watermark=%s, date=%s | ProcessingTime=%s, date=%s%n",
+                        System.out.printf("%s>> TimeWindow {start=%s, end=%s} | Watermark=%s, date=%s | ProcessingTime=%s, date=%s%n",
+                                Thread.currentThread().getId(),
                                 DateUtil.transFormat(context.window().getStart()),
                                 DateUtil.transFormat(context.window().getEnd()),
                                 context.currentWatermark(),

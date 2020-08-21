@@ -27,7 +27,7 @@ public class LateEventsSchedulePushServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new LateEventsPushHandler(2));
+                            socketChannel.pipeline().addLast(new LateEventsPushHandler(5));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
