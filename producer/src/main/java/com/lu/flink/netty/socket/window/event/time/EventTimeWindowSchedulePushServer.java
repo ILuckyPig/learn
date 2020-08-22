@@ -1,4 +1,4 @@
-package com.lu.flink.netty.socket.window;
+package com.lu.flink.netty.socket.window.event.time;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -9,10 +9,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-public class ProcessWindowSchedulePushServer {
+public class EventTimeWindowSchedulePushServer {
     private int port;
 
-    public ProcessWindowSchedulePushServer(int port) {
+    public EventTimeWindowSchedulePushServer(int port) {
         this.port = port;
     }
 
@@ -27,7 +27,7 @@ public class ProcessWindowSchedulePushServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new ProcessWindowPushHandler());
+                            socketChannel.pipeline().addLast(new EventTimeWindowPushHandler(5));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
@@ -48,6 +48,6 @@ public class ProcessWindowSchedulePushServer {
         } else {
             port = 9999;
         }
-        new ProcessWindowSchedulePushServer(port).run();
+        new EventTimeWindowSchedulePushServer(port).run();
     }
 }
