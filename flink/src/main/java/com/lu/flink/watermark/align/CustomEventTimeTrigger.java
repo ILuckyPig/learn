@@ -1,4 +1,4 @@
-package com.lu.flink.window.event.time;
+package com.lu.flink.watermark.align;
 
 import com.lu.util.DateUtil;
 import org.apache.flink.api.java.tuple.Tuple3;

@@ -1,4 +1,4 @@
-package com.lu.flink.window.event.time;
+package com.lu.flink.watermark.align;
 
 import com.lu.util.DateUtil;
 import org.apache.flink.api.common.eventtime.*;
@@ -17,7 +17,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-public class EventTimeWindowDemo {
+public class WatermarkAlignDemo {
     public static void main(String[] args) throws Exception {
         final StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
         environment.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
