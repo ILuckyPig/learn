@@ -11,10 +11,6 @@
 
     <artifactId>flink</artifactId>
 
-    <properties>
-        <flink.version>1.11.1</flink.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
