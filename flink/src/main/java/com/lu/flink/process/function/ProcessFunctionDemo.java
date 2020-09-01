@@ -76,6 +76,7 @@ public class ProcessFunctionDemo {
 
             if (eventTime <= timerService.currentWatermark()) {
                 // this event time is late;
+                // ctx.output(new OutputTag<Tuple4<Integer, LocalDateTime, Long, Float>>("id"){}, value);
             } else {
                 long endOfWindow = (eventTime - (eventTime % durationMsec) + durationMsec - 1);
 
