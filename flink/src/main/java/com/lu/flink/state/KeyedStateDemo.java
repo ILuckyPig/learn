@@ -21,13 +21,13 @@ public class KeyedStateDemo {
                         return Tuple2.of(strings[0], Integer.valueOf(strings[1]));
                     }
                 })
-                .keyBy(0)
+                .keyBy(tuple2 -> tuple2.f0)
                 .reduce(new RichReduceFunction<Tuple2<String, Integer>>() {
                     MapState<String, Integer> mapState;
 
                     @Override
                     public void open(Configuration parameters) throws Exception {
-                        MapStateDescriptor<String, Integer> mapStateDescriptor = new MapStateDescriptor<String, Integer>("mapState", String.class, Integer.class);
+                        MapStateDescriptor<String, Integer> mapStateDescriptor = new MapStateDescriptor<>("mapState", String.class, Integer.class);
                         mapState = getRuntimeContext().getMapState(mapStateDescriptor);
                     }
 
