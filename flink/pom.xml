@@ -24,22 +24,22 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-scala_2.11</artifactId>
+            <artifactId>flink-scala_2.12</artifactId>
             <version>${flink.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-scala_2.11</artifactId>
+            <artifactId>flink-streaming-scala_2.12</artifactId>
             <version>${flink.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-api-java-bridge_2.11</artifactId>
+            <artifactId>flink-table-api-java-bridge_2.12</artifactId>
             <version>${flink.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-planner_2.11</artifactId>
+            <artifactId>flink-table-planner_2.12</artifactId>
             <version>${flink.version}</version>
         </dependency>
         <dependency>
@@ -49,18 +49,18 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka_2.11</artifactId>
+            <artifactId>flink-connector-kafka_2.12</artifactId>
             <version>${flink.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-runtime-web_2.11</artifactId>
+            <artifactId>flink-runtime-web_2.12</artifactId>
             <version>${flink.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-state-processor-api_2.11</artifactId>
+            <artifactId>flink-state-processor-api_2.12</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -68,6 +68,11 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>29.0-jre</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.12.7</version>
         </dependency>
     </dependencies>
 
