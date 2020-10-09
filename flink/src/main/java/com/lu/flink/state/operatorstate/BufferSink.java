@@ -1,4 +1,4 @@
-package com.lu.flink.state.operator;
+package com.lu.flink.state.operatorstate;
 
 import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.api.common.state.ListStateDescriptor;
