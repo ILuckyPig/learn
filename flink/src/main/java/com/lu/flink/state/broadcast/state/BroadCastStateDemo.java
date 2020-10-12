@@ -1,4 +1,4 @@
-package com.lu.flink.state.broadcaststatepattern;
+package com.lu.flink.state.broadcast.state;
 
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
