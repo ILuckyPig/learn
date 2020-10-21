@@ -1,4 +1,4 @@
-package com.lu.flink.window.process.window.function;
+package com.lu.flink.operators.window.process.window.function;
 
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple3;

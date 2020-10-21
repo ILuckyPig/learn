@@ -1,4 +1,4 @@
-package com.lu.flink.window.incremental.aggregation;
+package com.lu.flink.operators.window.incremental.reduce;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.tuple.Tuple3;
@@ -8,7 +8,7 @@ import org.apache.flink.util.Collector;
 
 import java.util.List;
 
-public class MyWindowFunction extends ProcessWindowFunction<Tuple3<String, Long, Integer>, Tuple3<String, Long, Tuple3<String, Long, Integer>>, String, TimeWindow> {
+public class MyProcessWindowFunction extends ProcessWindowFunction<Tuple3<String, Long, Integer>, Tuple3<String, Long, Tuple3<String, Long, Integer>>, String, TimeWindow> {
     @Override
     public void process(String key,
                         Context context,
