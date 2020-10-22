@@ -1,4 +1,4 @@
-package com.lu.flink.netty.socket.window.process.window.function;
+package com.lu.flink.netty.socket.operators.window.incremental.aggregation;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;

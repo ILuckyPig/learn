@@ -1,4 +1,4 @@
-package com.lu.flink.netty.socket.window.incremental.aggregation;
+package com.lu.flink.netty.socket.operators.window.incremental.aggregation;
 
 import com.lu.flink.netty.socket.PushHandler;
 
