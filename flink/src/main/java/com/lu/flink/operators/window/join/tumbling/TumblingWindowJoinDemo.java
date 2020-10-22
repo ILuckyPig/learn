@@ -1,6 +1,7 @@
-package com.lu.flink.operators.window.join;
+package com.lu.flink.operators.window.join.tumbling;
 
-import org.apache.flink.api.common.eventtime.*;
+import com.lu.flink.operators.window.join.MyTimestampAssigner;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -20,27 +21,8 @@ public class TumblingWindowJoinDemo implements Serializable {
         environment.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
         environment.setParallelism(2);
 
-        WatermarkStrategy<Tuple2<Integer, Long>> timestampAssigner = new WatermarkStrategy<Tuple2<Integer, Long>>() {
-            @Override
-            public WatermarkGenerator<Tuple2<Integer, Long>> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
-                return new WatermarkGenerator<Tuple2<Integer, Long>>() {
-                    private long currentMaxTimestamp = Long.MIN_VALUE;
-
-                    @Override
-                    public void onEvent(Tuple2<Integer, Long> event, long eventTimestamp, WatermarkOutput output) {
-                        currentMaxTimestamp = Math.max(currentMaxTimestamp, event.f1);
-                        Watermark currentWaterMark = new Watermark(currentMaxTimestamp);
-                        output.emitWatermark(currentWaterMark);
-                    }
-
-                    @Override
-                    public void onPeriodicEmit(WatermarkOutput output) {
-
-                    }
-                };
-            }
-        }
-        .withTimestampAssigner((tuple2, timestamp) -> tuple2.f1);
+        WatermarkStrategy<Tuple2<Integer, Long>> timestampAssigner = new MyTimestampAssigner()
+                .withTimestampAssigner((tuple2, timestamp) -> tuple2.f1);
 
         DataStream<Tuple2<Integer, Long>> orangeStream = environment.socketTextStream("localhost", 9999)
                 .map(message -> {
