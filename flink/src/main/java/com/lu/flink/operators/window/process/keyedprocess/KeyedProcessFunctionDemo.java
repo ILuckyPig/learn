@@ -5,6 +5,7 @@ import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -12,6 +13,9 @@ import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 public class KeyedProcessFunctionDemo {
 
@@ -22,12 +26,12 @@ public class KeyedProcessFunctionDemo {
         environment.socketTextStream("localhost", 9999)
                 .map(message -> {
                     String[] strings = message.split(",");
-                    return Tuple2.of(strings[0], strings[1]);
+                    return Tuple3.of(strings[0], strings[1], LocalDateTime.parse(strings[2]));
                 })
-                .returns(Types.TUPLE(Types.STRING, Types.STRING))
+                .returns(Types.TUPLE(Types.STRING, Types.STRING, Types.LOCAL_DATE_TIME))
                 .assignTimestampsAndWatermarks(WatermarkStrategy
-                        .<Tuple2<String, String>>forMonotonousTimestamps()
-                        .withTimestampAssigner((tuple2, timestamp) -> System.currentTimeMillis()))
+                        .<Tuple3<String, String, LocalDateTime>>forMonotonousTimestamps()
+                        .withTimestampAssigner((tuple3, timestamp) -> tuple3.f2.toInstant(ZoneOffset.of("+8")).toEpochMilli()))
                 .keyBy(tuple2 -> tuple2.f0)
                 .process(new CountWithTimeoutFunction())
                 .print();
@@ -49,7 +53,7 @@ public class KeyedProcessFunctionDemo {
         }
     }
 
-    static class CountWithTimeoutFunction extends KeyedProcessFunction<String, Tuple2<String, String>, Tuple2<String, Long>> {
+    static class CountWithTimeoutFunction extends KeyedProcessFunction<String, Tuple3<String, String, LocalDateTime>, Tuple2<String, Long>> {
         private ValueState<CountWithTimestamp> valueState;
         private final Logger log = LoggerFactory.getLogger(KeyedProcessFunctionDemo.class);
 
@@ -59,7 +63,7 @@ public class KeyedProcessFunctionDemo {
         }
 
         @Override
-        public void processElement(Tuple2<String, String> value, Context ctx, Collector<Tuple2<String, Long>> out) throws Exception {
+        public void processElement(Tuple3<String, String, LocalDateTime> value, Context ctx, Collector<Tuple2<String, Long>> out) throws Exception {
             CountWithTimestamp current = valueState.value();
             if (current == null) {
                 current = new CountWithTimestamp();
@@ -69,13 +73,13 @@ public class KeyedProcessFunctionDemo {
             current.lastModified = ctx.timestamp();
             valueState.update(current);
             log.info("timestamp={}, {}", ctx.timestamp(), value);
-            ctx.timerService().registerEventTimeTimer(current.lastModified + 6000);
+            ctx.timerService().registerEventTimeTimer(current.lastModified + 60000);
         }
 
         @Override
         public void onTimer(long timestamp, OnTimerContext ctx, Collector<Tuple2<String, Long>> out) throws Exception {
             CountWithTimestamp countWithTimestamp = valueState.value();
-            if (countWithTimestamp.lastModified + 6000 == timestamp) {
+            if (countWithTimestamp.lastModified + 60000 == timestamp) {
                 out.collect(Tuple2.of(countWithTimestamp.key, countWithTimestamp.count));
             } else {
                 log.info("timestamp={}, {}", timestamp, countWithTimestamp);
