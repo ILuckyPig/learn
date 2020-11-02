@@ -8,8 +8,8 @@ import java.util.Map;
 
 public class YamlUtils {
 
-    private static Yaml yaml = new Yaml();
-    private static List<String> list = (List<String>) yaml.load(YamlUtils.class.getResourceAsStream("/application.yaml"));
+    private static final Yaml yaml = new Yaml();
+    private static final List<String> list = (List<String>) yaml.load(YamlUtils.class.getResourceAsStream("/application.yaml"));
 
     public static Map<Integer, String> getUserMap() {
         Map<Integer, String> userMap = new HashMap<>();

@@ -1,4 +1,4 @@
-package com.lu.flink.kafka.produce;
+package com.lu.flink.kafka.producer;
 
 import com.lu.flink.kafka.flink.utils.YamlUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -15,7 +15,7 @@ import java.util.concurrent.Future;
 
 public class ProducerDemo {
 
-    private Map<Integer, String> userMap = YamlUtils.getUserMap();
+    private final Map<Integer, String> userMap = YamlUtils.getUserMap();
 
     private String getUser() {
         int count = userMap.size();
