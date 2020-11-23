@@ -15,6 +15,10 @@ import org.apache.flink.types.Row;
 
 import static org.apache.flink.table.api.Expressions.$;
 
+/**
+ * Convert a Table into DataStream
+ * Retract Mode
+ */
 public class KafkaTableDemo {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -25,24 +29,24 @@ public class KafkaTableDemo {
                 .connect(new Kafka()
                         .version("universal")
                         .topic("user-search-log")
-                        .property(KafkaValidator.CONNECTOR_PROPERTIES_BOOTSTRAP_SERVER, "127.0.0.1:9092")
+                        .property("bootstrap.servers", "127.0.0.1:9092")
                         .property(KafkaValidator.CONNECTOR_PROPERTIES_GROUP_ID, "kafka-table-demo-group")
                         .startFromEarliest()
                 )
                 .withFormat(new Csv().fieldDelimiter(','))
                 .withSchema(new Schema()
-                        .field("date", DataTypes.TIMESTAMP())
+                        .field("date", DataTypes.TIMESTAMP(3))
                         .field("id", DataTypes.INT())
-                        .field("word", DataTypes.VARCHAR(30))
+                        .field("word", DataTypes.STRING())
                 )
                 .inAppendMode()
                 .createTemporaryTable("search_log");
         Table searchLog = tableEnvironment.from("search_log");
         Table result = searchLog
                 .groupBy($("id"), $("word"))
-                .select($("id").as("f0"), $("word").as("f1"), $("date").count().as("f2"));
+                .select($("id"), $("word"), $("date").count());
         DataStream<Tuple2<Boolean, Row>> stream = tableEnvironment.toRetractStream(result, Row.class);
         stream.print();
-        tableEnvironment.execute("");
+        environment.execute();
     }
 }

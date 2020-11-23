@@ -6,7 +6,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Properties;
@@ -34,8 +34,7 @@ public class TableProducerDemo {
         log.info("start send message to kafka");
         Random random = new Random();
         while (true) {
-            // TODO
-            String message = new Date(LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli()) + ",100," + words[random.nextInt(words.length)];
+            String message = new Timestamp(LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli()) + ",100," + words[random.nextInt(words.length)];
             log.info("{}", message);
             ProducerRecord<String, String> record = new ProducerRecord<>(topic, message);
             send(producer, record);
