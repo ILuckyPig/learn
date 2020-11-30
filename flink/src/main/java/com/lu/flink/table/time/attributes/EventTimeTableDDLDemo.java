@@ -2,10 +2,11 @@ package com.lu.flink.table.time.attributes;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
-import org.apache.flink.table.api.TableResult;
+import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import org.apache.flink.types.Row;
 
-public class TableDDLDemo {
+public class EventTimeTableDDLDemo {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
         environment.setParallelism(2);
@@ -27,7 +28,7 @@ public class TableDDLDemo {
                         "   'scan.startup.mode' = 'earliest-offset'" +
                         ")");
 
-        TableResult tableResult = tableEnvironment.executeSql(
+        Table table = tableEnvironment.sqlQuery(
                 "SELECT " +
                         "   id," +
                         "   TUMBLE_END(log_time,INTERVAL '10' SECONDS) AS end_time," +
@@ -36,7 +37,9 @@ public class TableDDLDemo {
                         " GROUP BY" +
                         "   id," +
                         "   TUMBLE(log_time,INTERVAL '10' SECONDS)");
-        // TODO print
-        tableEnvironment.execute("table.ddl.event.time.demo");
+
+        tableEnvironment.toAppendStream(table, Row.class).print();
+
+        environment.execute();
     }
 }
