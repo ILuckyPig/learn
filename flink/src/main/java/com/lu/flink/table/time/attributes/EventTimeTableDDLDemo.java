@@ -9,7 +9,7 @@ import org.apache.flink.types.Row;
 public class EventTimeTableDDLDemo {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
-        environment.setParallelism(2);
+        environment.setParallelism(1);
         EnvironmentSettings settings = EnvironmentSettings.newInstance().inStreamingMode().useBlinkPlanner().build();
         StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(environment, settings);
         tableEnvironment.executeSql(
