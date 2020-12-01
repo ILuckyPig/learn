@@ -1,9 +1,10 @@
 package com.lu.flink.table.time.attributes;
 
-import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.flink.api.common.eventtime.*;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -18,7 +19,6 @@ import org.apache.flink.table.sources.RowtimeAttributeDescriptor;
 import org.apache.flink.table.sources.StreamTableSource;
 import org.apache.flink.table.sources.tsextractors.ExistingField;
 import org.apache.flink.table.sources.wmstrategies.PreserveWatermarks;
-import org.apache.flink.table.types.DataType;
 import org.apache.flink.types.Row;
 
 import java.sql.Timestamp;
@@ -43,13 +43,8 @@ public class EventTimeTableSourceDemo {
 
         class UserSearchLogSource implements StreamTableSource<Row>, DefinedRowtimeAttributes {
             @Override
-            public DataType getProducedDataType() {
-                // TODO data type
-                return DataTypes.ROW(
-                        DataTypes.FIELD("log_time", DataTypes.TIMESTAMP(3)),
-                        DataTypes.FIELD("id", DataTypes.INT()),
-                        DataTypes.FIELD("word", DataTypes.STRING())
-                );
+            public TypeInformation<Row> getReturnType() {
+                return Types.ROW_NAMED(new String[]{"log_time", "id", "word"}, Types.SQL_TIMESTAMP, Types.INT, Types.STRING);
             }
 
             @Override
@@ -67,13 +62,10 @@ public class EventTimeTableSourceDemo {
                             @Override
                             public Row map(String value) throws Exception {
                                 String[] strings = value.split(",");
-                                Row row = new Row(3);
-                                row.setField(0, Timestamp.valueOf(strings[0]));
-                                row.setField(1, Integer.parseInt(strings[1]));
-                                row.setField(2, strings[2]);
-                                return row;
+                                return Row.of(Timestamp.valueOf(strings[0]), Integer.parseInt(strings[1]), strings[2]);
                             }
                         })
+                        .returns(Types.ROW_NAMED(new String[]{"log_time", "id", "word"}, Types.SQL_TIMESTAMP, Types.INT, Types.STRING))
                         .assignTimestampsAndWatermarks(new WatermarkStrategy<Row>() {
                             @Override
                             public WatermarkGenerator<Row> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
@@ -82,7 +74,7 @@ public class EventTimeTableSourceDemo {
 
                                     @Override
                                     public void onEvent(Row event, long eventTimestamp, WatermarkOutput output) {
-                                        currentMaxTimestamp = Math.max(((TimeStamp) event.getField(0)).getTime(), currentMaxTimestamp);
+                                        currentMaxTimestamp = Math.max(((Timestamp) event.getField(0)).getTime(), currentMaxTimestamp);
                                         output.emitWatermark(new Watermark(currentMaxTimestamp));
                                     }
 
@@ -92,7 +84,7 @@ public class EventTimeTableSourceDemo {
                                     }
                                 };
                             }
-                        }.withTimestampAssigner((event, timestamp) -> ((TimeStamp) event.getField(0)).getTime()));
+                        }.withTimestampAssigner((event, timestamp) -> ((Timestamp) event.getField(0)).getTime()));
             }
 
             @Override
