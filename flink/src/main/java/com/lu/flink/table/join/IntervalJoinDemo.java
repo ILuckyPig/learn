@@ -8,7 +8,11 @@ import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 
-// TODO IntervalJoinDemo
+/**
+ * 1> 3,Euro,2020-12-04T11:15,Euro,119
+ * 1> 3,Euro,2020-12-04T10:45,Euro,116
+ * 1> 2,Euro,2020-12-04T10:45,Euro,116
+ */
 public class IntervalJoinDemo {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -23,7 +27,7 @@ public class IntervalJoinDemo {
                 "CREATE TABLE orders (" +
                         "   order_time TIMESTAMP(3)," +
                         "   amount INT," +
-                        "   currency STRING" +
+                        "   currency STRING," +
                         "   WATERMARK FOR order_time AS order_time" +
                         ") WITH (" +
                         "   'connector' = 'kafka'," +
@@ -38,7 +42,7 @@ public class IntervalJoinDemo {
                 "CREATE TABLE rates_history (" +
                         "   history_time TIMESTAMP(3)," +
                         "   currency STRING," +
-                        "   rate INT" +
+                        "   rate INT," +
                         "   WATERMARK FOR history_time AS history_time" +
                         ") WITH (" +
                         "   'connector' = 'kafka'," +
@@ -50,8 +54,16 @@ public class IntervalJoinDemo {
                         "   'scan.startup.mode' = 'earliest-offset'" +
                         ")");
 
-        Table table = tableEnvironment.sqlQuery("SELECT * FROM orders, rate_history WHERE orders.currency = rates_history.currency" +
-                " AND orders.order_time BETWEEN ");
+        Table table = tableEnvironment.sqlQuery(
+                "SELECT " +
+                        // "orders.order_time," +
+                        "orders.amount," +
+                        "orders.currency," +
+                        "rates_history.history_time," +
+                        "rates_history.currency," +
+                        "rates_history.rate" +
+                        " FROM orders, rates_history WHERE orders.currency = rates_history.currency" +
+                " AND orders.order_time BETWEEN rates_history.history_time - INTERVAL '45' MINUTE AND rates_history.history_time");
         tableEnvironment.toAppendStream(table, Row.class).print();
         environment.execute();
     }

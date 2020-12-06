@@ -10,6 +10,15 @@ import org.apache.flink.types.Row;
 
 /**
  * EvenTime不能用于regular join
+ *
+ * 1> 2020-12-04T19:14:09,50,Yen,2020-12-04T09:00,Yen,1
+ * 1> 2020-12-04T10:52,5,Us Dollar,2020-12-04T09:00,Us Dollar,102
+ * 1> 2020-12-04T10:15,2,Euro,2020-12-04T11:15,Euro,119
+ * 1> 2020-12-04T10:32,3,Euro,2020-12-04T11:15,Euro,119
+ * 1> 2020-12-04T10:15,2,Euro,2020-12-04T09:00,Euro,114
+ * 1> 2020-12-04T10:32,3,Euro,2020-12-04T09:00,Euro,114
+ * 1> 2020-12-04T10:15,2,Euro,2020-12-04T10:45,Euro,116
+ * 1> 2020-12-04T10:32,3,Euro,2020-12-04T10:45,Euro,116
  */
 public class RegularJoinDemo {
     public static void main(String[] args) throws Exception {
