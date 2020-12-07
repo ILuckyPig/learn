@@ -9,15 +9,10 @@ import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 
-/**
- * 1> 3,Euro,2020-12-04T11:15,Euro,119
- * 1> 3,Euro,2020-12-04T10:45,Euro,116
- * 1> 2,Euro,2020-12-04T10:45,Euro,116
- */
-public class IntervalJoinDemo {
+public class JoinTemporalTableDemo {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
-        environment.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+        environment.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
         environment.enableCheckpointing(10 * 1000);
         environment.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
         environment.getCheckpointConfig().enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
@@ -30,7 +25,7 @@ public class IntervalJoinDemo {
                         "   order_time TIMESTAMP(3)," +
                         "   amount INT," +
                         "   currency STRING," +
-                        "   WATERMARK FOR order_time AS order_time" +
+                        "   process_time AS PROCTIME()" +
                         ") WITH (" +
                         "   'connector' = 'kafka'," +
                         "   'topic' = 'Orders'," +
@@ -44,8 +39,7 @@ public class IntervalJoinDemo {
                 "CREATE TABLE rates_history (" +
                         "   history_time TIMESTAMP(3)," +
                         "   currency STRING," +
-                        "   rate INT," +
-                        "   WATERMARK FOR history_time AS history_time" +
+                        "   rate INT" +
                         ") WITH (" +
                         "   'connector' = 'kafka'," +
                         "   'topic' = 'RatesHistory'," +
@@ -55,17 +49,15 @@ public class IntervalJoinDemo {
                         "   'csv.field-delimiter' = ','," +
                         "   'scan.startup.mode' = 'earliest-offset'" +
                         ")");
-
+        // TODO sql error
         Table table = tableEnvironment.sqlQuery(
-                "SELECT " +
-                        // "orders.order_time," +
-                        "orders.amount," +
-                        "orders.currency," +
-                        "rates_history.history_time," +
-                        "rates_history.currency," +
-                        "rates_history.rate" +
-                        " FROM orders, rates_history WHERE orders.currency = rates_history.currency" +
-                " AND orders.order_time BETWEEN rates_history.history_time - INTERVAL '45' MINUTE AND rates_history.history_time");
+                "SELECT\n" +
+                        "  o.amount, o.currency, r.rate, o.amount * r.rate\n" +
+                        "FROM\n" +
+                        "  orders AS o\n" +
+                        "  JOIN rates_history FOR SYSTEM_TIME AS OF o.process_time AS r\n" +
+                        "  ON r.currency = o.currency"
+        );
         tableEnvironment.toAppendStream(table, Row.class).print();
         environment.execute();
     }
