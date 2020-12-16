@@ -8,12 +8,13 @@ services:
   kafka:
     image: wurstmeister/kafka
     ports:
-      - "9092:9092"
+      - "9095:9095"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://172.18.0.3:9092
-      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_LISTENERS: PLAINTEXT://:9092,OUTSIDE://:9095
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka_kafka_1:9092,OUTSIDE://localhost:9095
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,OUTSIDE:PLAINTEXT
     volumes:
-      - C:/warehouse/software/docker/docker.sock:/var/run/docker.sock
+      - E:/software/docker/kafka/docker.sock:/var/run/docker.sock
     restart: always
