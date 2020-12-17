@@ -2,9 +2,7 @@ package com.lu.flink.table.join;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
-import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.apache.flink.types.Row;
 
 public class EventTimeTemporalJoinDemo {
     public static void main(String[] args) throws Exception {
@@ -44,19 +42,35 @@ public class EventTimeTemporalJoinDemo {
                         "   'csv.field-delimiter' = ','," +
                         "   'scan.startup.mode' = 'earliest-offset'" +
                         ")");
-
-        // TODO Temporal Table Join requires primary key in versioned table, but no primary key can be found
-        Table table = tableEnvironment.sqlQuery(
-                "SELECT " +
-                        "     order_id," +
-                        "     price," +
-                        "     orders.currency," +
-                        "     conversion_rate," +
-                        "     order_time" +
+        tableEnvironment.executeSql(
+                "CREATE VIEW versioned_rates AS" +
+                        "   SELECT currency, conversion_rate, update_time" +
+                        "   FROM (" +
+                        "       SELECT *," +
+                        "       ROW_NUMBER() OVER (PARTITION BY currency ORDER BY update_time DESC) AS rownum" +
+                        "       FROM currency_rates)" +
+                        "   WHERE rownum = 1"
+        );
+        tableEnvironment.executeSql(
+                "CREATE TABLE print (" +
+                        "    order_id    STRING," +
+                        "    price       DECIMAL(32,2)," +
+                        "    currency    STRING," +
+                        "    conversion_rate DECIMAL(32, 2)," +
+                        "    order_time  TIMESTAMP(3)" +
+                        ") WITH ('connector'='print')"
+        );
+        // TODO why
+        tableEnvironment.executeSql(
+                "INSERT INTO print SELECT" +
+                        "   order_id," +
+                        "   price," +
+                        "   orders.currency," +
+                        "   conversion_rate," +
+                        "   order_time" +
                         " FROM orders" +
-                        " LEFT JOIN currency_rates FOR SYSTEM_TIME AS OF orders.order_time" +
-                        " ON orders.currency = currency_rates.currency");
-        tableEnvironment.toAppendStream(table, Row.class).print();
+                        " LEFT JOIN versioned_rates FOR SYSTEM_TIME AS OF orders.order_time" +
+                        " ON orders.currency = versioned_rates.currency");
         environment.execute();
     }
 }
