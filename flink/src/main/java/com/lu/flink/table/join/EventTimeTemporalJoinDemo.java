@@ -4,6 +4,9 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
+/**
+ * join算子的watermark取决于两表较小的watermark，watermark决定了数据的计算
+ */
 public class EventTimeTemporalJoinDemo {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -60,7 +63,7 @@ public class EventTimeTemporalJoinDemo {
                         "    order_time  TIMESTAMP(3)" +
                         ") WITH ('connector'='print')"
         );
-        // TODO why
+
         tableEnvironment.executeSql(
                 "INSERT INTO print SELECT" +
                         "   order_id," +

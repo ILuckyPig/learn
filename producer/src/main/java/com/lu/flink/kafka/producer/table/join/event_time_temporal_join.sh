@@ -8,7 +8,7 @@ kafka-console-producer.sh --broker-list kafka_kafka_1:9092 --topic event-time-te
 >4,3,Euro,2020-12-04 10:32:00
 >5,5,Us Dollar,2020-12-04 10:52:00
 
-kafka-console-producer.sh --broker-list kafka_kafka_1:9092 --topic event-time-temporal-join-demo-currency-rates --property parse.key=true
+kafka-console-producer.sh --broker-list kafka_kafka_1:9092 --topic event-time-temporal-join-demo-currency-rates
 >Us Dollar,102,2020-12-04 09:00:00
 >Euro,114,2020-12-04 09:00:00
 >Yen,1,2020-12-04 09:00:00
