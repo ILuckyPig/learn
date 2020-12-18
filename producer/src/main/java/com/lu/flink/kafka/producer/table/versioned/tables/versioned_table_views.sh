@@ -1,3 +1,4 @@
+kafka-topics.sh --create --topic versioned-table-views-currency-rates --partitions 2 --zookeeper zookeeper:2181 --replication-factor 1
 kafka-console-producer.sh --broker-list kafka_kafka_1:9092 --topic versioned-table-views-currency-rates
 >{"currency": "Us Dollar", "conversion_rate": 102, "update_time": "2020-12-04 09:00:00"}
 >{"currency": "Euro", "conversion_rate": 114, "update_time": "2020-12-04 09:00:00"}
