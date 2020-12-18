@@ -5,6 +5,7 @@ import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 /**
+ * versioned table join
  * join算子的watermark取决于两表较小的watermark，watermark决定了数据的计算
  */
 public class EventTimeTemporalJoinDemo {
