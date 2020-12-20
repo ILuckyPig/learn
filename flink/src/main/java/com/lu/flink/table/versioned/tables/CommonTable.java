@@ -18,7 +18,10 @@ public class CommonTable {
                         "   PRIMARY KEY(currency) NOT ENFORCED" +
                         ") WITH (" +
                         "   'connector'='jdbc'," +
-                        "   'url'='jdbc:mysql://localhost:3306/learn'," +
+                        "   'url'='jdbc:mysql://localhost:3306/learn?serverTimezone=GMT%2B8'," +
+                        "   'driver'='com.mysql.cj.jdbc.Driver'," +
+                        "   'username'='root'," +
+                        "   'password'='root'," +
                         "   'table-name'='lates_rates'" +
                         ")"
         );
