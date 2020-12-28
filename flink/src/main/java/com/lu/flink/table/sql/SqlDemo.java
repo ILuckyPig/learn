@@ -1,4 +1,4 @@
-package com.lu.flink.sql;
+package com.lu.flink.table.sql;
 
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.typeinfo.Types;
