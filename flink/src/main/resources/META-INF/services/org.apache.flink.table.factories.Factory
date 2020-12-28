@@ -1,0 +1,2 @@
+com.lu.flink.table.user.defined.SocketDynamicTableFactory
+com.lu.flink.table.user.defined.ChangelogCsvFormatFactory
