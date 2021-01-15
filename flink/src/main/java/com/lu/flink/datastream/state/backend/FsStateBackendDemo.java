@@ -8,6 +8,7 @@ import org.apache.flink.formats.json.JsonNodeDeserializationSchema;
 import org.apache.flink.runtime.state.StateBackend;
 import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -25,9 +26,10 @@ public class FsStateBackendDemo {
 
         CheckpointConfig checkpointConfig = environment.getCheckpointConfig();
         checkpointConfig.enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
+        checkpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
         // checkpointConfig.enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
 
-        environment.enableCheckpointing(10 * 1000);
+        environment.enableCheckpointing(1000);
         environment.setParallelism(1);
         environment.setStateBackend(stateBackend);
 
@@ -47,6 +49,7 @@ public class FsStateBackendDemo {
                     public Tuple2<Integer, Integer> reduce(Tuple2<Integer, Integer> value1, Tuple2<Integer, Integer> value2) throws Exception {
                         int o = value1.f1 + value2.f1;
                         Tuple2<Integer, Integer> result = Tuple2.of(value1.f0, o);
+                        System.out.println("result: " + result);
                         LocalDateTime time = LocalDateTime.now();
                         // TODO 查看是否有状态
                         if (result.f0 == 2 && time.isBefore(upper)) {
