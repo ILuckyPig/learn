@@ -16,6 +16,23 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import java.time.LocalDateTime;
 import java.util.Properties;
 
+/**
+ * print result:
+ * (1,1)
+ * (1,2)
+ * (1,3)
+ * (1,4)
+ * (1,4)
+ * (1,4)
+ * (1,4)
+ * (1,4)
+ *
+ * kafka-offset:
+ * GROUP                  TOPIC            PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+ * kafka-state-demo-group fs-state-backend 1          4               6               2               -               -               -
+ * kafka-state-demo-group fs-state-backend 0          0               4               4               -               -               -
+ *
+ */
 public class FsStateBackendDemo {
     public static void main(String[] args) throws Exception {
         ParameterTool parameterTool = ParameterTool.fromArgs(args);
@@ -29,7 +46,7 @@ public class FsStateBackendDemo {
         checkpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
         // checkpointConfig.enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
 
-        environment.enableCheckpointing(1000);
+        environment.enableCheckpointing(10);
         environment.setParallelism(1);
         environment.setStateBackend(stateBackend);
 
@@ -42,24 +59,26 @@ public class FsStateBackendDemo {
         FlinkKafkaConsumer<ObjectNode> ratesHistoryConsumer = new FlinkKafkaConsumer<>("fs-state-backend", new JsonNodeDeserializationSchema(), properties);
         environment.addSource(ratesHistoryConsumer)
                 .map(node -> Tuple2.of(node.get("id").intValue(), 1))
+                .uid("map-to-kv")
                 .returns(Types.TUPLE(Types.INT, Types.INT))
+                .uid("returns")
                 .keyBy(tuple -> tuple.f0)
                 .reduce(new ReduceFunction<Tuple2<Integer, Integer>>() {
                     @Override
                     public Tuple2<Integer, Integer> reduce(Tuple2<Integer, Integer> value1, Tuple2<Integer, Integer> value2) throws Exception {
                         int o = value1.f1 + value2.f1;
                         Tuple2<Integer, Integer> result = Tuple2.of(value1.f0, o);
-                        System.out.println("result: " + result);
                         LocalDateTime time = LocalDateTime.now();
                         // TODO 查看是否有状态
-                        if (result.f0 == 2 && time.isBefore(upper)) {
+                        if (result.f1 == 5 && time.isBefore(upper)) {
                             throw new Exception(time + " < " + upper);
                         }
-                        Thread.sleep(10 * 1000);
                         return result;
                     }
                 })
-                .print();
+                .uid("reduce")
+                .print()
+                .uid("print");
         environment.execute();
     }
 }

@@ -3,12 +3,12 @@ kafka-console-producer.sh --broker-list kafka_kafka_1:9092 --topic fs-state-back
 kafka-consumer-groups.sh --bootstrap-server kafka_kafka_1:9092 --topic fs-state-backend --group kafka-state-demo-group --reset-offsets --to-earliest --execute
 kafka-consumer-groups.sh --bootstrap-server kafka_kafka_1:9092 --describe --group kafka-state-demo-group
 {"id": 1}
-{"id": 2}
 {"id": 1}
-{"id": 3}
-{"id": 4}
-{"id": 2}
-{"id": 6}
-{"id": 7}
 {"id": 1}
-{"id": 10}
+{"id": 1}
+{"id": 1}
+{"id": 1}
+{"id": 1}
+{"id": 1}
+{"id": 1}
+{"id": 1}
