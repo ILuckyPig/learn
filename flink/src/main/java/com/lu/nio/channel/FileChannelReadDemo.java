@@ -12,7 +12,7 @@ import java.nio.channels.FileChannel;
 public class FileChannelReadDemo {
     public static void main(String[] args) throws IOException {
         URL resource = FileChannelReadDemo.class.getResource("/");
-        RandomAccessFile aFile = new RandomAccessFile(resource.getPath() + "log4j.properties", "rw");
+        RandomAccessFile aFile = new RandomAccessFile(resource.getPath() + "log4j2-test.properties", "rw");
         FileChannel inChannel = aFile.getChannel();
 
         ByteBuffer buf = ByteBuffer.allocate(48);

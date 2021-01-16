@@ -10,7 +10,7 @@ public class HandingApplicationParametersDemo {
         ParameterTool argsParameter = ParameterTool.fromArgs(args);
         String input = argsParameter.getRequired("input");
         ParameterTool propertiesParameter = ParameterTool.fromPropertiesFile(HandingApplicationParametersDemo.class
-                .getResource("/log4j.properties").getFile());
+                .getResource("/log4j2-test.properties").getFile());
         String root = propertiesParameter.get("log4j.rootLogger");
         long log = propertiesParameter.getLong("log", 1L);
         ParameterTool systemProperties = ParameterTool.fromSystemProperties();

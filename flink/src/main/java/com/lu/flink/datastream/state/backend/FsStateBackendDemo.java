@@ -1,5 +1,6 @@
 package com.lu.flink.datastream.state.backend;
 
+import com.lu.util.CheckpointRestoreUtils;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -32,6 +33,16 @@ import java.util.Properties;
  * kafka-state-demo-group fs-state-backend 1          4               6               2               -               -               -
  * kafka-state-demo-group fs-state-backend 0          0               4               4               -               -               -
  *
+ * recover from checkpoint
+ * 1. 状态中存储了reduce状态的结果(1,4)
+ * 2. 此时会忽略kafka consumer的offset
+ *
+ * (1,5)
+ * (1,6)
+ * (1,7)
+ * (1,8)
+ * (1,9)
+ * (1,10)
  */
 public class FsStateBackendDemo {
     public static void main(String[] args) throws Exception {
@@ -79,6 +90,8 @@ public class FsStateBackendDemo {
                 .uid("reduce")
                 .print()
                 .uid("print");
-        environment.execute();
+        // environment.execute();
+        String externalCheckpoint = "C:/warehouse/study/learn/flink/src/main/resources/checkpoints/98b758cf81fa081cdfb071c2716fc64e/chk-286";
+        CheckpointRestoreUtils.run(environment.getStreamGraph(), externalCheckpoint);
     }
 }

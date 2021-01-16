@@ -12,7 +12,7 @@ import java.nio.file.StandardOpenOption;
 
 public class AsynchronousFileChannelDemo2 {
     public static void main(String[] args) throws URISyntaxException, IOException {
-        URL resource = FileChannelReadDemo.class.getResource("/log4j.properties");
+        URL resource = FileChannelReadDemo.class.getResource("/log4j2-test.properties");
         System.out.println(Paths.get(resource.toURI()).toString());
         Path path = Paths.get(Paths.get(resource.toURI()).toString());
         AsynchronousFileChannel asynchronousFileChannel = AsynchronousFileChannel.open(path, StandardOpenOption.READ);

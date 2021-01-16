@@ -1,9 +1,6 @@
 package com.lu.nio.channel;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -19,7 +16,7 @@ import java.util.concurrent.Future;
  */
 public class AsynchronousFileChannelDemo {
     public static void main(String[] args) throws IOException, URISyntaxException, ExecutionException, InterruptedException {
-        URL resource = FileChannelReadDemo.class.getResource("/log4j.properties");
+        URL resource = FileChannelReadDemo.class.getResource("/log4j2-test.properties");
         System.out.println(Paths.get(resource.toURI()).toString());
         Path path = Paths.get(Paths.get(resource.toURI()).toString());
         AsynchronousFileChannel asynchronousFileChannel = AsynchronousFileChannel.open(path, StandardOpenOption.READ);
