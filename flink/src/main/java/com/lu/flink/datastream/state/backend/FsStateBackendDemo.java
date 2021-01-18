@@ -80,7 +80,6 @@ public class FsStateBackendDemo {
                         int o = value1.f1 + value2.f1;
                         Tuple2<Integer, Integer> result = Tuple2.of(value1.f0, o);
                         LocalDateTime time = LocalDateTime.now();
-                        // TODO 查看是否有状态
                         if (result.f1 == 5 && time.isBefore(upper)) {
                             throw new Exception(time + " < " + upper);
                         }
