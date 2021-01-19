@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.Properties;
 
 /**
- * TODO test rocksdb recovery
  * bug: rocksdb write windows path limit
  */
 public class RocksDBStateBackendDemo {
