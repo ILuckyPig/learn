@@ -1,6 +1,5 @@
 package com.lu.flink.datastream.state.backend;
 
-import com.lu.util.CheckpointRestoreUtils;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -17,6 +16,10 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import java.time.LocalDateTime;
 import java.util.Properties;
 
+/**
+ * TODO test rocksdb recovery
+ * bug: rocksdb write windows path limit
+ */
 public class RocksDBStateBackendDemo {
     public static void main(String[] args) throws Exception {
         ParameterTool parameterTool = ParameterTool.fromArgs(args);
@@ -62,8 +65,8 @@ public class RocksDBStateBackendDemo {
                 .uid("reduce")
                 .print()
                 .uid("print");
-        // environment.execute();
-        String externalCheckpoint = "C:/warehouse/study/learn/flink/src/main/resources/checkpoints/98b758cf81fa081cdfb071c2716fc64e/chk-286";
-        CheckpointRestoreUtils.run(environment.getStreamGraph(), externalCheckpoint);
+        environment.execute();
+        // String externalCheckpoint = System.getProperty("user.dir") + "/flink/src/main/resources/checkpoints/" + "e284a356abf5a6496f2f146c49d72077/chk-137";
+        // CheckpointRestoreUtils.run(environment.getStreamGraph(), externalCheckpoint);
     }
 }
