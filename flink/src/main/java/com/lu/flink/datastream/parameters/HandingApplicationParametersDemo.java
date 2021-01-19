@@ -5,6 +5,9 @@ import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
+/**
+ * -input xxx
+ */
 public class HandingApplicationParametersDemo {
     public static void main(String[] args) throws Exception {
         ParameterTool argsParameter = ParameterTool.fromArgs(args);
