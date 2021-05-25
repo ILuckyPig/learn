@@ -16,5 +16,5 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka_kafka_1:9092,OUTSIDE://localhost:9095
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,OUTSIDE:PLAINTEXT
     volumes:
-      - E:/software/docker/kafka/docker.sock:/var/run/docker.sock
+      - ./docker.sock:/var/run/docker.sock
     restart: always
