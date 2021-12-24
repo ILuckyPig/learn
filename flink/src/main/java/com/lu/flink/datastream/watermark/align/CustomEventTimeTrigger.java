@@ -13,22 +13,21 @@ import org.apache.flink.streaming.runtime.io.PushingAsyncDataInput.DataOutput;
 import org.apache.flink.streaming.runtime.io.StreamTaskNetworkInput;
 import org.apache.flink.streaming.runtime.operators.windowing.WindowOperator.Context;
 import org.apache.flink.streaming.runtime.streamrecord.StreamElement;
-import org.apache.flink.streaming.runtime.streamstatus.StatusWatermarkValve;
 import org.apache.flink.streaming.runtime.tasks.OneInputStreamTask;
+import org.apache.flink.streaming.runtime.watermarkstatus.StatusWatermarkValve;
 
 import java.time.LocalDateTime;
 
 /**
  * {@link StreamTaskNetworkInput#emitNext(DataOutput)} <br/>
- *  -> {@link StreamTaskNetworkInput#processElement(StreamElement, DataOutput)} <br/>
- *  -> {@link StatusWatermarkValve#inputWatermark(Watermark,int)} <br/>
- *  -> {@link StatusWatermarkValve#findAndOutputNewMinWatermarkAcrossAlignedChannels()} <br/>
- *  -> {@link OneInputStreamTask.StreamTaskNetworkOutput#emitWatermark(Watermark)} <br/>
- *  -> {@link AbstractStreamOperator#processWatermark(Watermark)} <br/>
- *  -> {@link InternalTimeServiceManager#advanceWatermark(Watermark)} <br/>
- *  -> {@link InternalTimerServiceImpl#advanceWatermark(long)} <br/>
- *  -> {@link Context#getCurrentWatermark()} <br/>
- *
+ * -> {@link StreamTaskNetworkInput#processElement(StreamElement, DataOutput)} <br/>
+ * -> {@link StatusWatermarkValve#inputWatermark(Watermark, int, DataOutput)} <br/>
+ * -> {@link StatusWatermarkValve#findAndOutputNewMinWatermarkAcrossAlignedChannels(DataOutput)} <br/>
+ * -> {@link OneInputStreamTask.StreamTaskNetworkOutput#emitWatermark(Watermark)} <br/>
+ * -> {@link AbstractStreamOperator#processWatermark(Watermark)} <br/>
+ * -> {@link InternalTimeServiceManager#advanceWatermark(Watermark)} <br/>
+ * -> {@link InternalTimerServiceImpl#advanceWatermark(long)} <br/>
+ * -> {@link Context#getCurrentWatermark()} <br/>
  */
 public class CustomEventTimeTrigger extends Trigger<Object, TimeWindow> {
 
