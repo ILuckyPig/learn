@@ -1,4 +1,4 @@
-package com.lu.flink.table.join.socket;
+package com.lu.flink.table.join.regular.join;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -17,7 +17,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
  * 3,40,2021-12-25 00:02:00
  * </pre>
  */
-public class RegularInnerJoinDemo {
+public class RegularLeftJoinDemo {
     public static void main(String[] args) {
         StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
         environment.setParallelism(1);
@@ -62,6 +62,6 @@ public class RegularInnerJoinDemo {
                 "       ,seat_price" +
                 "       ,order_timestamp" +
                 "   FROM order_log o" +
-                "   INNER JOIN price_log p ON o.order_id = p.order_id");
+                "   LEFT JOIN price_log p ON o.order_id = p.order_id");
     }
 }
